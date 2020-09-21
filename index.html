@@ -1,0 +1,89 @@
+<!-- vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+    <script crossorigin="anonymous" src="https://polyfill.io/v3/polyfill.min.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <form class="form-inline mt-3 mb-3">
+        <div class="form-group">
+          <select name="gender" class="form-control">
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="">Any</option>
+          </select>
+        </div>
+        <div class="form-group ml-2">
+          <input name="age_min" type="number" class="form-control" placeholder="Min age" value="25" style="width:125px">
+        </div>
+        <div class="form-group ml-2">
+          <input name="age_max" type="number" class="form-control" placeholder="Max age" value="" style="width:125px">
+        </div>
+        <button type="submit" class="btn btn-primary ml-2">Query</button>
+      </form>
+
+      <div class="results mb-3"></div>
+
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.rawgit.com/jashkenas/coffeescript/1.11.1/extras/coffee-script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
+<script type="text/coffeescript">
+$ ->
+  log = (x...) -> try console.log x...
+
+  log 'rdy', new Date
+
+  DICT = []
+
+  fetch('./dict.json')
+    .then (r) -> r.json()
+    .then (r) ->
+      DICT = r
+      run()
+
+  run = (->
+    opt = {}
+
+    for x in $('form').serializeArray()
+      opt[x.name] = x.value
+
+    results = _.filter DICT, (x) ->
+      if opt.gender
+        if x.gender isnt opt.gender then return false
+      if opt.age_min
+        if x.age < opt.age_min then return false
+      if opt.age_max
+        if x.age > opt.age_max then return false
+      return true
+
+    $('div.results').html ''
+
+    for x in _.shuffle(results)
+      $('div.results').append """
+        <div class="card mr-2 mb-2" style="width: 18rem;display:inline-block">
+          <img class="card-img-top" src="./images/#{x.file}" alt="#{x.file}">
+          <div class="card-body">
+            <h5 class="card-title">#{x.file}</h5>
+            <p class="card-text">Age: #{x.age}</p>
+          </div>
+        </div>
+      """
+  )
+
+  $('form').submit (e) ->
+    e.preventDefault()
+    run()
+
+</script>
+  </body>
+</html>
+

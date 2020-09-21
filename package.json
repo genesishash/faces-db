@@ -1,0 +1,9 @@
+{
+  "name": "faces-db",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "wegweg": "^0.17.0"
+  }
+}
